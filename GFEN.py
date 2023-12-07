@@ -8,6 +8,8 @@ import scipy.ndimage as sn
 import os
 import numpy.linalg as la
 from sklearn.preprocessing import MinMaxScaler
+import openpyxl
+from openpyxl import Workbook
 from input_data import preprocess_data, load_sz_data, load_los_data
 import h5py
 from tgcn import tgcnCell
@@ -42,14 +44,14 @@ training_epoch = FLAGS.training_epoch
 gru_units = FLAGS.gru_units
 
 ###### load data ######
-data, ad1 = load_los_data('los')
-print(data.shape)
-# data = pd.read_pickle('F:\papercode\MTGNN-master\data/speed_matrix_2015')
-# data = np.array(data)
-# ad1 = np.load('F:\papercode\MTGNN-master\data/Loop_Seattle_2015_A.npy')
-# time_len1 = data.shape[0]
-# num_nodes1 = data.shape[1]
-# data = data[int(time_len1*0.22):int(time_len1*0.29)]
+# data, ad1 = load_los_data('los')
+# print(data.shape)
+data = pd.read_pickle('F:\papercode\MTGNN-master\data/speed_matrix_2015')
+data = np.array(data)
+ad1 = np.load('F:\papercode\MTGNN-master\data/Loop_Seattle_2015_A.npy')
+time_len1 = data.shape[0]
+num_nodes1 = data.shape[1]
+data = data[int(time_len1*0.15):int(time_len1*0.17)]
 
 def softmax(x):
     return np.exp(x) / np.sum(np.exp(x))
@@ -107,6 +109,12 @@ def bias_construction(spacoror, weight1, weight2):
 time_len = data.shape[0]
 num_nodes = data.shape[1]
 data1 = np.mat(data, dtype=np.float32)
+# noise = np.random.normal(0,2,size=data.shape)
+# noise = np.random.poisson(16,size=data.shape)
+# scaler = MinMaxScaler()
+# scaler.fit(noise)
+# noise = scaler.transform(noise)
+# data1 = data1 + noise
 
 datainv = np.zeros((time_len-5, num_nodes))
 for i in range(num_nodes):
@@ -306,5 +314,10 @@ print('min_rmse:%r' % (np.min(test_rmse)),
       'max_acc:%r' % (test_acc[index]),
       'r2:%r' % (test_r2[index]),
       'var:%r' % test_var[index])
-
-
+# predict = test_result[:,0]
+# train_rmse = np.array(train_rmse)
+# df1 = pd.DataFrame(predict)
+# df2 = pd.DataFrame(train_rmse)
+#
+# df1.to_excel('Seattle.xlsx', index=False)
+# df2.to_excel('Seatrain.xlsx', index=False)
